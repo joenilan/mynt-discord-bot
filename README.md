@@ -7,3 +7,12 @@ npm install node-bittrex-api
 npm install bitcoin-core
 npm install sqlite3
 npm install axios
+
+Create a secrets.json file in the root directory:
+```
+{ 
+  "token"  : "discord.secret.token.goes.here",
+  "prefix" : ".",
+  "prefix-crypto" : "$"
+}
+```
