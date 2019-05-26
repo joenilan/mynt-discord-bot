@@ -1,0 +1,28 @@
+{
+  "name": "mynt-discord-bot",
+  "version": "0.0.1",
+  "description": "Mynt Discord bot",
+  "main": "bot.js",
+  "dependencies": {
+    "bitcoin-core": "^2.0.0",
+    "discord.js": "^11.5.0",
+    "node-binance-api": "^0.9.1",
+    "node-bittrex-api": "^0.8.3",
+    "axios": "^0.18.0",
+    "sqlite3": "^4.0.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": ".help"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joenilan/mynt-discord-bot.git"
+  },
+  "author": "DreadedZombie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joenilan/mynt-discord-bot/issues"
+  },
+  "homepage": "https://github.com/joenilan/mynt-discord-bot#readme"
+}

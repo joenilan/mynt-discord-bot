@@ -1,5 +1,34 @@
+// Load other Modules
+// require("./modules/swiftex.cmd.js");
+const Files = require('fs');
+bot.commands = [];
+Files.readdir('./modules/', (err, files) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+
+  files.forEach((file, index) => {
+    console.log(file);
+    if (file.endsWith('.cmd.js'))
+      bot.commands.push(require('./modules/' + file)(bot, config));
+  });
+});
+
+// Update bot Status
+function updatePresence() {
+  let guilds = bot.guilds ? bot.guilds.array().length : 0;
+  bot.user.setPresence({
+    status: 'online',
+    game: {
+      name: `in ${guilds} guild${guilds === 1 ? '' : 's'} | ${
+        config.prefix
+      }help`
+    }
+  });
+}
+
 // Load up the discord.js library
-require("./modules/swiftex.js");
 const Discord = require("discord.js");
 
 // This is your client. Some people call it `bot`, some people call it `self`, 
