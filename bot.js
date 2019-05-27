@@ -13,25 +13,25 @@ const config = require("./secrets.json");
 
 // Load other Modules
 // require("./modules/swiftex.cmd.js");
-const Files = require('fs');
+// const Files = require('fs');
 
-client.modules = [];
-Files.readdir('./modules/', (err, files) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log("Loading modules...");
-  console.log(" ");
-  files.forEach((file, index) => {
-    if (file.endsWith('.cmd.js')){
-    console.log(file);
-    client.modules.push(require('./modules/' + file));
-    }
-  });
-  console.log("Finished.");
-  console.log(" ");
-});
+// client.modules = [];
+// Files.readdir('./modules/', (err, files) => {
+//   if (err) {
+//     console.error(err);
+//     process.exit(1);
+//   }
+//   console.log("Loading modules...");
+//   console.log(" ");
+//   files.forEach((file, index) => {
+//     if (file.endsWith('.cmd.js')){
+//     console.log(file);
+//     client.modules.push(require('./modules/' + file));
+//     }
+//   });
+//   console.log("Finished.");
+//   console.log(" ");
+// });
 
 // Update bot Status
 function updatePresence() {
@@ -72,7 +72,6 @@ client.on("guildDelete", guild => {
 
 client.on("message", async message => {
   // This event will run on every single message received, from any channel or DM.
-  
   // It's good practice to ignore other bots. This also makes your bot ignore itself
   // and not get into a spam loop (we call that "botception").
   if(message.author.bot) return;
@@ -90,6 +89,31 @@ client.on("message", async message => {
   
   // Let's go with a few common example commands! Feel free to delete or change those.
   
+  if(command === "help") {
+  const exampleEmbed = new Discord.RichEmbed()
+	.setColor('#0099ff')
+	.setTitle('Some title')
+	.setURL('https://discord.js.org/')
+	.setAuthor('Myntos - The freshmaker', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png', 'https://discord.js.org')
+	.setDescription('Some description here')
+	.setThumbnail('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
+	.addField('Regular field title', 'Some value here')
+	.addBlankField()
+	.addField('Inline field title', 'Some value here', true)
+	.addField('Inline field title', 'Some value here', true)
+	.addField('Inline field title', 'Some value here', true)
+	.setImage('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
+	.setTimestamp()
+	.setFooter('Some footer text here', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png');
+
+    // Calculates ping between sending a message and editing it, giving a nice round-trip latency.
+    // The second ping is an average latency between the bot and the websocket server (one-way, not round-trip)
+    // const m = await message.channel.send("help?");
+    // m.edit(`shit goes here? ${m.createdTimestamp - message.createdTimestamp}ms.`);
+    message.channel.send('```test```');
+    message.channel.send(exampleEmbed);
+  }
+   
   if(command === "ping") {
     // Calculates ping between sending a message and editing it, giving a nice round-trip latency.
     // The second ping is an average latency between the bot and the websocket server (one-way, not round-trip)
