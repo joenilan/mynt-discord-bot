@@ -1,38 +1,8 @@
-// Load other Modules
-// require("./modules/swiftex.cmd.js");
-const Files = require('fs');
-bot.commands = [];
-Files.readdir('./modules/', (err, files) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-
-  files.forEach((file, index) => {
-    console.log(file);
-    if (file.endsWith('.cmd.js'))
-      bot.commands.push(require('./modules/' + file)(bot, config));
-  });
-});
-
-// Update bot Status
-function updatePresence() {
-  let guilds = bot.guilds ? bot.guilds.array().length : 0;
-  bot.user.setPresence({
-    status: 'online',
-    game: {
-      name: `in ${guilds} guild${guilds === 1 ? '' : 's'} | ${
-        config.prefix
-      }help`
-    }
-  });
-}
-
 // Load up the discord.js library
 const Discord = require("discord.js");
 
 // This is your client. Some people call it `bot`, some people call it `self`, 
-// some might call it `cootchie`. Either way, when you see `client.something`, or `bot.something`,
+// some might call it `cootchie`. Either way, when you see `client.something`, or `client.something`,
 // this is what we're refering to. Your client.
 const client = new Discord.Client();
 
@@ -41,13 +11,50 @@ const config = require("./secrets.json");
 // config.token contains the bot's token
 // config.prefix contains the message prefix.
 
+// Load other Modules
+// require("./modules/swiftex.cmd.js");
+const Files = require('fs');
+
+client.modules = [];
+Files.readdir('./modules/', (err, files) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log("Loading modules...");
+  console.log(" ");
+  files.forEach((file, index) => {
+    if (file.endsWith('.cmd.js')){
+    console.log(file);
+    client.modules.push(require('./modules/' + file));
+    }
+  });
+  console.log("Finished.");
+  console.log(" ");
+});
+
+// Update bot Status
+function updatePresence() {
+  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+//   let guilds = client.guilds ? client.guilds.array().length : 0;
+//   client.user.setPresence({
+//     status: 'online',
+//     game: {
+//       name: `in ${guilds} guild${guilds === 1 ? '' : 's'} | ${
+//         config.prefix
+//       }help`
+//     }
+//   });
+}
+
 client.on("ready", () => {
   // This event will run if the bot starts, and logs in, successfully.
+    console.log("Welcome to Myntos, the Mynt Discord Bot." + client.user.tag)
     console.log("Connected as: " + client.user.tag)
     console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
   // Example of changing the bot's playing game to something useful. `client.user` is what the
   // docs refer to as the "ClientUser".
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  updatePresence();
 });
 
 client.on("guildCreate", guild => {

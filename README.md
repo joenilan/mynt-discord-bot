@@ -1,12 +1,12 @@
 # mynt-discord-bot
 
 Dependencies:
-npm install discord.js
-npm install node-binance-api
-npm install node-bittrex-api
-npm install bitcoin-core
-npm install sqlite3
-npm install axios
+npm install discord.js \
+&& npm install node-binance-api \
+&& npm install node-bittrex-api \
+&& npm install bitcoin-core \
+&& npm install sqlite3 \
+&& npm install axios
 
 Create a secrets.json file in the root directory:
 ```
