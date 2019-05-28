@@ -1,5 +1,6 @@
 // Load up the discord.js library
 const Discord = require("discord.js");
+const axios = require('axios');
 
 // This is your client. Some people call it `bot`, some people call it `self`, 
 // some might call it `cootchie`. Either way, when you see `client.something`, or `client.something`,
@@ -48,13 +49,30 @@ function updatePresence() {
 }
 
 client.on("ready", () => {
-  // This event will run if the bot starts, and logs in, successfully.
-    console.log("Welcome to Myntos, the Mynt Discord Bot." + client.user.tag)
-    console.log("Connected as: " + client.user.tag)
-    console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
+  console.log("");
+  console.log("███╗   ███╗██╗   ██╗███╗   ██╗████████╗ ██████╗ ███████╗");
+  console.log("████╗ ████║╚██╗ ██╔╝████╗  ██║╚══██╔══╝██╔═══██╗██╔════╝");
+  console.log("██╔████╔██║ ╚████╔╝ ██╔██╗ ██║   ██║   ██║   ██║███████╗");
+  console.log("██║╚██╔╝██║  ╚██╔╝  ██║╚██╗██║   ██║   ██║   ██║╚════██║");
+  console.log("██║ ╚═╝ ██║   ██║   ██║ ╚████║   ██║   ╚██████╔╝███████║");
+  console.log("╚═╝     ╚═╝   ╚═╝   ╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚══════╝");
+  console.log("");
+  client.guilds.forEach((guild) => {
+    console.log('Connected to ' + guild.name)
+    });
+  console.log("Connected as: " + client.user.tag)
+  console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
+  console.log("===============================================================");
+  client.guilds.forEach((guild) => {
+    guild.channels.forEach((channel) => {
+    console.log(` - ${channel.name} ${channel.type} [${channel.id}]`)
+  })
+});
   // Example of changing the bot's playing game to something useful. `client.user` is what the
   // docs refer to as the "ClientUser".
   updatePresence();
+
+
 });
 
 client.on("guildCreate", guild => {
@@ -69,25 +87,109 @@ client.on("guildDelete", guild => {
   client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
+client.on('guildMemberAdd', member => {
+  // Send the message to a designated channel on a server:
+  const channel = member.guild.channels.find(ch => ch.name === 'bot-logs');
+  // Do nothing if the channel wasn't found on this server
+  if (!channel) return;
+  // Send the message, mentioning the member
+  channel.send(`Welcome to the server, ${member}`);
+});
 
 client.on("message", async message => {
-  // This event will run on every single message received, from any channel or DM.
-  // It's good practice to ignore other bots. This also makes your bot ignore itself
-  // and not get into a spam loop (we call that "botception").
   if(message.author.bot) return;
-  
-  // Also good practice to ignore any message that does not start with our prefix, 
-  // which is set in the configuration file.
-  if(message.content.indexOf(config.prefix) !== 0) return;
-  
-  // Here we separate our "command" name, and our "arguments" for the command. 
-  // e.g. if we have the message "+say Is this the real life?" , we'll get the following:
-  // command = say
-  // args = ["Is", "this", "the", "real", "life?"]
+  //if(message.content.indexOf(config.prefix_crypto) !== 0) return;
+  if(message.content.indexOf(config.prefix) !== 0){
+  } else if(message.content.indexOf(config.prefix_crypto) !== 0){
+  };
+
+  const args_crypto = message.content.slice(config.prefix_crypto.length).trim().split(/ +/g);
+  const command_crypto = args_crypto.shift().toLowerCase();
+
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+
+  //if(command_crypto === "price" + coin.slice(2,7)) {
+  if(command_crypto === "price") {
+    
+    if(message.content.startsWith(config.prefix)) {
+
+    } else if(message.content.startsWith(config.prefix_crypto)) {
+      // console.log("Args1: " + args)
+      // console.log("Args2: " + command_crypto+args)
+      // console.log("Args3: " + config.prefix_crypto+command_crypto+" "+args)
+      var coins = ["mynt",
+       "aus",
+       "oasis",
+       "slice",
+       "odin",
+       "rito",
+       "pown"];
+      // var result = coins.includes(args)
+      if (coins.includes(args.toString())) {
+                axios.all([
+                  axios.get('https://swiftex.co/api/v2/tickers'),
+                  axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
+                ]).then(axios.spread((response1, response2) => {
+                  price = response1.data[args.toString()+'-btc']['ticker']['last']
+                  bitcoin_price = response2.data['bitcoin']['usd']
+                  total_price = Number(price) * Number(bitcoin_price)
+                  client.channels.get("575569258046554112").send("$"+total_price.toFixed(9))
+                  //console.log(bitcoin_price)
+                  //console.log(price)
+                  //console.log(total_price)
+                  
+                })).catch(error => {
+                  console.log(error);
+                });
+      } else if (args.toString() == "btc"){
+
+                axios.all([
+                  axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
+                ]).then(axios.spread((response1) => {
+                  bitcoin_price = response1.data['bitcoin']['usd']
+                  client.channels.get("575569258046554112").send("$"+bitcoin_price)
+                  //console.log(bitcoin_price)
+                  //console.log(price)
+                  //console.log(total_price)
+                  
+                })).catch(error => {
+                  console.log(error);
+                });
+            
+      } else if (args.toString() == "eth"){
+       
+        axios.all([
+          axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
+        ]).then(axios.spread((response1) => {
+          ether_price = response1.data['ethereum']['usd']
+          client.channels.get("575569258046554112").send("$"+ether_price)
+          //console.log(bitcoin_price)
+          //console.log(price)
+          //console.log(total_price)
+          
+        })).catch(error => {
+          console.log(error);
+      });
+
+
+      } else {
+        console.log("NAH")
+      }
+
+
+      // const channel = member.guild.channels.find(ch => ch.name === 'bot-logs');
+      // // Do nothing if the channel wasn't found on this server
+      // if (!channel) return;
+      // // Send the message, mentioning the member
+      // channel.send(`this will be price shit`);
+      //console.log(config.crypto_prefix+coin.slice(2,7))
+      //console.log(command_crypto)
+      //console.log(message.content)
+      //console.log(coins)
   
-  // Let's go with a few common example commands! Feel free to delete or change those.
+    }
+  }  
   
   if(command === "help") {
   const exampleEmbed = new Discord.RichEmbed()
@@ -113,7 +215,7 @@ client.on("message", async message => {
     message.channel.send('```test```');
     message.channel.send(exampleEmbed);
   }
-   
+
   if(command === "ping") {
     // Calculates ping between sending a message and editing it, giving a nice round-trip latency.
     // The second ping is an average latency between the bot and the websocket server (one-way, not round-trip)
@@ -135,7 +237,7 @@ client.on("message", async message => {
     // This command must be limited to mods and admins. In this example we just hardcode the role names.
     // Please read on Array.some() to understand this bit: 
     // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/some?
-    if(!message.member.roles.some(r=>["Administrator", "Moderator"].includes(r.name)) )
+    if(!message.member.roles.some(r=>["Administrator", "Moderator", "Big Man"].includes(r.name)) )
       return message.reply("Sorry, you don't have permissions to use this!");
     
     // Let's first check if we have a member and if we can kick them!
@@ -155,8 +257,11 @@ client.on("message", async message => {
     // Now, time for a swift kick in the nuts!
     await member.kick(reason)
       .catch(error => message.reply(`Sorry ${message.author} I couldn't kick because of : ${error}`));
-    message.reply(`${member.user.tag} has been kicked by ${message.author.tag} because: ${reason}`);
-
+    const channel = member.guild.channels.find(ch => ch.name === 'bot-logs');
+    // Do nothing if the channel wasn't found on this server
+    if (!channel) return;
+    // Send the message, mentioning the member
+    channel.send(`${member.user.tag} has been kicked by ${message.author.tag} because: ${reason}`);
   }
   
   if(command === "ban") {
