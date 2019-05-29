@@ -110,39 +110,126 @@ client.on("message", async message => {
   const command = args.shift().toLowerCase();
 
   //if(command_crypto === "price" + coin.slice(2,7)) {
+
+  if(command_crypto === "convert") {
+    if(message.content.startsWith(config.prefix)) {
+
+    } else if(message.content.startsWith(config.prefix_crypto)) { 
+      
+      axios.all([
+        axios.get('https://swiftex.co/api/v2/tickers'),
+        axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
+      ]).then(axios.spread((response1, response2) => {
+        //var price = response1.data[args_crypto[2]+'-btc']['ticker']['last']
+        // var change = response1.data[args_crypto[2]+'-btc']['ticker']['price_change_percent']
+        //var volume = Number(response1.data[args_crypto[2].toString()+'-btc']['ticker']['vol'])
+        // var high = response1.data[args_crypto[2].toString()+'-btc']['ticker']['high']
+        // var low = response1.data[args_crypto[2].toString()+'-btc']['ticker']['low']
+        var last = response1.data[args_crypto[1].toLowerCase()+'-btc']['ticker']['last']
+        var bitcoin_price = response2.data['bitcoin']['usd']
+        var convert = Number(args_crypto[0])*Number(last)
+        // var total_price = Number(price) * Number(bitcoin_price)
+        // var total_price_volume = (Number(price) * Number(volume)) * Number(bitcoin_price)
+        // console.log('Conversion: ' + Number(args_crypto[0])*Number(last))
+        message.channel.send(convert.toFixed(8) +' BTC');
+                  //console.log(bitcoin_price)
+      //console.log(args_crypto[0])
+        
+      })).catch(error => {
+        console.log(error);
+      });
+
+      // var coins = [
+      //   "aus",
+      //   "bsha3",
+      //   //"dei",
+      //   "genix",
+      //   "ltncg",
+      //   "mymn",
+      //   "mynt",
+      //   "oasis",
+      //   "odin",
+      //   "pgn",
+      //   "pown",
+      //   "rito",
+      //   "rvn",
+      //   "slc"
+      //  ];
+      //  // var result = coins.includes(args)
+      //  if (coins.includes(args_crypto.toString())) {
+      //  }
+    }
+  }
+
   if(command_crypto === "price") {
     
     if(message.content.startsWith(config.prefix)) {
 
     } else if(message.content.startsWith(config.prefix_crypto)) {
-      // console.log("Args1: " + args)
-      // console.log("Args2: " + command_crypto+args)
-      // console.log("Args3: " + config.prefix_crypto+command_crypto+" "+args)
-      var coins = ["mynt",
+
+      var coins = [
        "aus",
+       "bsha3",
+       //"dei",
+       "genix",
+       "ltncg",
+       "mymn",
+       "mynt",
        "oasis",
-       "slice",
        "odin",
+       "pgn",
+       "pown",
        "rito",
-       "pown"];
-      // var result = coins.includes(args)
-      if (coins.includes(args.toString())) {
+       "rvn",
+       "slc"
+      ];
+      if (coins.includes(args_crypto.toString().toLowerCase())) {
                 axios.all([
                   axios.get('https://swiftex.co/api/v2/tickers'),
                   axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
                 ]).then(axios.spread((response1, response2) => {
-                  price = response1.data[args.toString()+'-btc']['ticker']['last']
-                  bitcoin_price = response2.data['bitcoin']['usd']
-                  total_price = Number(price) * Number(bitcoin_price)
-                  client.channels.get("575569258046554112").send("$"+total_price.toFixed(9))
+                  var price = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
+                  var change = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['price_change_percent']
+                  var volume = Number(response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['vol'])
+                  var high = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['high']
+                  var low = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['low']
+                  var last = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
+                  var bitcoin_price = response2.data['bitcoin']['usd']
+                  var total_price = Number(price) * Number(bitcoin_price)
+                  var total_price_volume = (Number(price) * Number(volume)) * Number(bitcoin_price)
+                  //client.channels.get("575569258046554112").send("$"+total_price.toFixed(9))
                   //console.log(bitcoin_price)
+                  const priceEmbed = new Discord.RichEmbed()
+                  .setColor('#5AC9E4')
+                  .setTitle(args_crypto.toString().toUpperCase())
+                  .setURL('https://swiftex.co/trading/'+args_crypto.toString()+"-btc")
+                  .setAuthor('Swiftex Price Check', 'https://swiftex.co/images/logo.png', 'https://swiftex.co')
+                  //.setDescription('Some description here```\nwhere will this be?``` ```where will this be?```')
+                  .setThumbnail('https://swiftex.co/assets/'+ args_crypto.toString() +'.png')
+                  .addField('High', '```'+high + " BTC```", true)
+                  .addField('Low', '```'+low + " BTC```", true)
+                  .addField('Price', '```'+'$'+total_price.toFixed(9)+'```', true)
+                  .addField('Change', '```diff\n'+change+'```', true)
+                  .addField('Last', '```'+last + " BTC```")
+                  //.addBlankField()
+                  .addField('Volume', '```'+volume.toFixed(4) + " " + args_crypto.toString().toUpperCase()+' ($'+total_price_volume.toFixed(4)+')'+'```')
+                  .addBlankField()
+                  //.addField('Inline field title', 'Some value here', true)
+                  //.setImage('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
+                  .setTimestamp()
+                  .setFooter('Retrieved by Myntos', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png');
+                
+                  message.channel.send(priceEmbed);
+                
+                  //message.channel.get("575569258046554112").send(priceEmbed);
+                  //client.channel.ge.get("575569258046554112").send(priceEmbed);t("575569258046554112").send(priceEmbed);
                   //console.log(price)
                   //console.log(total_price)
                   
                 })).catch(error => {
                   console.log(error);
                 });
-      } else if (args.toString() == "btc"){
+      } else if (args_crypto.toString() == "btc"){
 
                 axios.all([
                   axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
@@ -157,7 +244,7 @@ client.on("message", async message => {
                   console.log(error);
                 });
             
-      } else if (args.toString() == "eth"){
+      } else if (args_crypto.toString() == "eth"){
        
         axios.all([
           axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
@@ -174,7 +261,7 @@ client.on("message", async message => {
 
 
       } else {
-        console.log("NAH")
+          client.channels.get("575569258046554112").send('Ticker not found!')
       }
 
 
