@@ -65,7 +65,7 @@ client.on("ready", () => {
   console.log("===============================================================");
   client.guilds.forEach((guild) => {
     guild.channels.forEach((channel) => {
-    console.log(` - ${channel.name} ${channel.type} [${channel.id}]`)
+    //console.log(` - ${channel.name} ${channel.type} [${channel.id}]`)
   })
 });
   // Example of changing the bot's playing game to something useful. `client.user` is what the
