@@ -108,7 +108,22 @@ client.on("message", async message => {
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
-
+  const coins = [
+    "aus",
+    "bsha3",
+    //"dei",
+    "genix",
+    "ltncg",
+    "mymn",
+    "mynt",
+    "oasis",
+    "odin",
+    "pgn",
+    "pown",
+    "rito",
+    "rvn",
+    "slc"
+   ];
   //if(command_crypto === "price" + coin.slice(2,7)) {
 
   if(command_crypto === "convert") {
@@ -139,61 +154,25 @@ client.on("message", async message => {
         console.log(error);
       });
 
-      // var coins = [
-      //   "aus",
-      //   "bsha3",
-      //   //"dei",
-      //   "genix",
-      //   "ltncg",
-      //   "mymn",
-      //   "mynt",
-      //   "oasis",
-      //   "odin",
-      //   "pgn",
-      //   "pown",
-      //   "rito",
-      //   "rvn",
-      //   "slc"
-      //  ];
-      //  // var result = coins.includes(args)
-      //  if (coins.includes(args_crypto.toString())) {
-      //  }
     }
   }
 
-  if(command_crypto === "price") {
-    
     if(message.content.startsWith(config.prefix)) {
 
     } else if(message.content.startsWith(config.prefix_crypto)) {
 
-      var coins = [
-       "aus",
-       "bsha3",
-       //"dei",
-       "genix",
-       "ltncg",
-       "mymn",
-       "mynt",
-       "oasis",
-       "odin",
-       "pgn",
-       "pown",
-       "rito",
-       "rvn",
-       "slc"
-      ];
-      if (coins.includes(args_crypto.toString().toLowerCase())) {
+
+      if (coins.includes(command_crypto.toString().toLowerCase())) {
                 axios.all([
                   axios.get('https://swiftex.co/api/v2/tickers'),
                   axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
                 ]).then(axios.spread((response1, response2) => {
-                  var price = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
-                  var change = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['price_change_percent']
-                  var volume = Number(response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['vol'])
-                  var high = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['high']
-                  var low = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['low']
-                  var last = response1.data[args_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
+                  var price = response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
+                  var change = response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['price_change_percent']
+                  var volume = Number(response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['vol'])
+                  var high = response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['high']
+                  var low = response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['low']
+                  var last = response1.data[command_crypto.toString().toLowerCase()+'-btc']['ticker']['last']
                   var bitcoin_price = response2.data['bitcoin']['usd']
                   var total_price = Number(price) * Number(bitcoin_price)
                   var total_price_volume = (Number(price) * Number(volume)) * Number(bitcoin_price)
@@ -201,41 +180,50 @@ client.on("message", async message => {
                   //console.log(bitcoin_price)
                   const priceEmbed = new Discord.RichEmbed()
                   .setColor('#5AC9E4')
-                  .setTitle(args_crypto.toString().toUpperCase())
-                  .setURL('https://swiftex.co/trading/'+args_crypto.toString()+"-btc")
+                  .setTitle(command_crypto.toString().toUpperCase())
+                  .setURL('https://swiftex.co/trading/'+command_crypto.toString()+"-btc")
                   .setAuthor('Swiftex Price Check', 'https://swiftex.co/images/logo.png', 'https://swiftex.co')
                   //.setDescription('Some description here```\nwhere will this be?``` ```where will this be?```')
-                  .setThumbnail('https://swiftex.co/assets/'+ args_crypto.toString() +'.png')
+                  .setThumbnail('https://swiftex.co/assets/'+ command_crypto.toString() +'.png')
                   .addField('High', '```'+high + " BTC```", true)
                   .addField('Low', '```'+low + " BTC```", true)
                   .addField('Price', '```'+'$'+total_price.toFixed(9)+'```', true)
                   .addField('Change', '```diff\n'+change+'```', true)
                   .addField('Last', '```'+last + " BTC```")
                   //.addBlankField()
-                  .addField('Volume', '```'+volume.toFixed(4) + " " + args_crypto.toString().toUpperCase()+' ($'+total_price_volume.toFixed(4)+')'+'```')
-                  .addBlankField()
+                  .addField('Volume', '```'+volume.toFixed(4) + " " + command_crypto.toString().toUpperCase()+' ($'+total_price_volume.toFixed(4)+')'+'```')
                   //.addField('Inline field title', 'Some value here', true)
                   //.setImage('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
                   .setTimestamp()
                   .setFooter('Retrieved by Myntos', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png');
-                
-                  message.channel.send(priceEmbed);
-                
+                  let member = message.mentions.members.first();
+                  const channel = message.guild.channels.find(ch => ch.name === 'price-check');
+                  console.log(channel.name, message.channel.name)
+                  if (message.channel.name === channel.name) {
+                    if (!channel) return;
+                    channel.send(priceEmbed);
+                  } else {
+                    if (!channel) return;
+                    message.reply("Price retreived! Please check" + channel);
+                    channel.send(priceEmbed);
+                  }
+                  //message.author.send(priceEmbed);
                   //message.channel.get("575569258046554112").send(priceEmbed);
-                  //client.channel.ge.get("575569258046554112").send(priceEmbed);t("575569258046554112").send(priceEmbed);
+                  //client.channel.get("575569258046554112").send(priceEmbed);t("575569258046554112").send(priceEmbed);
                   //console.log(price)
                   //console.log(total_price)
                   
                 })).catch(error => {
                   console.log(error);
                 });
-      } else if (args_crypto.toString() == "btc"){
+      } else if (command_crypto.toString() == "btc"){
 
                 axios.all([
                   axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
                 ]).then(axios.spread((response1) => {
                   bitcoin_price = response1.data['bitcoin']['usd']
-                  client.channels.get("575569258046554112").send("$"+bitcoin_price)
+                  //message.author.send(priceEmbed);
+//                  client.channels.get("575569258046554112").send("$"+bitcoin_price)
                   //console.log(bitcoin_price)
                   //console.log(price)
                   //console.log(total_price)
@@ -244,13 +232,14 @@ client.on("message", async message => {
                   console.log(error);
                 });
             
-      } else if (args_crypto.toString() == "eth"){
+      } else if (command_crypto.toString() == "eth"){
        
         axios.all([
           axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
         ]).then(axios.spread((response1) => {
           ether_price = response1.data['ethereum']['usd']
-          client.channels.get("575569258046554112").send("$"+ether_price)
+          //message.author.send(priceEmbed);
+          //client.channels.get("575569258046554112").send("$"+ether_price)
           //console.log(bitcoin_price)
           //console.log(price)
           //console.log(total_price)
@@ -259,48 +248,40 @@ client.on("message", async message => {
           console.log(error);
       });
 
-
       } else {
+        if (command_crypto === "convert") {
+          
+        } else {
           client.channels.get("575569258046554112").send('Ticker not found!')
+        }
       }
-
-
-      // const channel = member.guild.channels.find(ch => ch.name === 'bot-logs');
-      // // Do nothing if the channel wasn't found on this server
-      // if (!channel) return;
-      // // Send the message, mentioning the member
-      // channel.send(`this will be price shit`);
-      //console.log(config.crypto_prefix+coin.slice(2,7))
-      //console.log(command_crypto)
-      //console.log(message.content)
-      //console.log(coins)
-  
     }
-  }  
   
-  if(command === "help") {
-  const exampleEmbed = new Discord.RichEmbed()
-	.setColor('#0099ff')
-	.setTitle('Some title')
-	.setURL('https://discord.js.org/')
-	.setAuthor('Myntos - The freshmaker', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png', 'https://discord.js.org')
-	.setDescription('Some description here')
-	.setThumbnail('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
-	.addField('Regular field title', 'Some value here')
+  if(command === "cmds") {
+  const helpCommand = new Discord.RichEmbed()
+	.setColor('#4b367c')
+	//.setTitle('Myntos - Help')
+	//.setURL('https://getmynt.io/')
+	.setAuthor('Myntos - Help', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png', 'https://getmynt.io')
+  //.setDescription('Myntos Help:\nBot Commands (.)\n - help - This command\n- More - More Stuff')
+	.setThumbnail('https://getmynt.io/wp-content/uploads/2019/05/help-1.png')
+	.addField('Commands (.)', '**__.cmds__** - This command\n**__.kick @username__** - Kick a user from the server\n**__.ban @username reason__** - Ban a user from the server\n**__.purge #__** - Clean up chat')
 	.addBlankField()
-	.addField('Inline field title', 'Some value here', true)
-	.addField('Inline field title', 'Some value here', true)
-	.addField('Inline field title', 'Some value here', true)
-	.setImage('https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png')
+	.addField('Crypto Commands ($)', '**__$convert__** - convert an amount to bitcoin\n**__$ticker__**')
+	//.addField('Inline field title', 'Some value here', true)
+	//.addField('Inline field title', 'Some value here', true)
+	//.addField('Inline field title', 'Some value here', true)
+	//.setImage('https://getmynt.io/wp-content/uploads/2019/05/help-1.png')
 	.setTimestamp()
-	.setFooter('Some footer text here', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png');
+	.setFooter('Myntos', 'https://getmynt.io/wp-content/uploads/2019/01/mynt-logo.png');
 
     // Calculates ping between sending a message and editing it, giving a nice round-trip latency.
     // The second ping is an average latency between the bot and the websocket server (one-way, not round-trip)
     // const m = await message.channel.send("help?");
     // m.edit(`shit goes here? ${m.createdTimestamp - message.createdTimestamp}ms.`);
-    message.channel.send('```test```');
-    message.channel.send(exampleEmbed);
+    //message.channel.send('```test```');
+    message.author.send(helpCommand);
+    message.reply("Check your DM's for info.");
   }
 
   if(command === "ping") {
