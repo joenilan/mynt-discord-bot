@@ -1,6 +1,7 @@
 // Load up the discord.js library
 const Discord = require("discord.js");
 const axios = require('axios');
+const fs = require('fs');
 
 // This is your client. Some people call it `bot`, some people call it `self`, 
 // some might call it `cootchie`. Either way, when you see `client.something`, or `client.something`,
@@ -48,6 +49,53 @@ function updatePresence() {
 //   });
 }
 
+function grabInfo() {
+  axios.all([
+    axios.get('https://swiftex.co/api/v2/tickers/mynt-btc'),
+    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
+    axios.get('https://api.coingecko.com/api/v3/coins/mynt'),
+    
+  ]).then(axios.spread((response1, response2, response3) => {
+    var totalSupply = response3.data['market_data']['total_supply']
+    var marketCapUSD = response3.data['market_data']['market_cap']['usd']
+    var circulatingSupply = response3.data['market_data']['circulating_supply']
+    var geckoRank = response3.data['coingecko_rank']
+    var lastPrice = response1.data['ticker']['last']
+    var volume = response1.data['ticker']['volume']
+    var lastUpdated = response1.data['at']
+    var btcPrice = response2.data['bitcoin']['usd']
+    var convertedPrice = (Number(lastPrice) * Number(btcPrice)).toFixed(9)
+    var ticker = {
+      "mynt": [
+          {
+              "id": "mynt", 
+              "name": "Mynt", 
+              "symbol": "MYNT", 
+              "rank": geckoRank.toString(), 
+              "price_usd": convertedPrice, 
+              "price_btc": lastPrice, 
+              "24h_volume_usd": volume, 
+              "market_cap_usd": marketCapUSD.toString(), 
+              "available_supply": circulatingSupply.toString(), 
+              "total_supply": totalSupply.toString(), 
+              "max_supply": totalSupply.toString(),
+              "percent_change_1h": "0", 
+              "percent_change_24h": "0", 
+              "percent_change_7d": "0", 
+              "last_updated": lastUpdated.toString()
+          }
+      ]
+  }
+    fs.writeFile("ticker.json", JSON.stringify(ticker), function(err) {
+    if(err) {
+        return console.log(err);
+    }
+    }); 
+  })).catch(error => {
+    console.log(error);
+  });
+}
+
 client.on("ready", () => {
   console.log("");
   console.log("███╗   ███╗██╗   ██╗███╗   ██╗████████╗ ██████╗ ███████╗");
@@ -65,13 +113,13 @@ client.on("ready", () => {
   console.log("===============================================================");
   client.guilds.forEach((guild) => {
     guild.channels.forEach((channel) => {
-    //console.log(` - ${channel.name} ${channel.type} [${channel.id}]`)
   })
-});
-  // Example of changing the bot's playing game to something useful. `client.user` is what the
-  // docs refer to as the "ClientUser".
+  });
   updatePresence();
-
+  setInterval(function() {
+    grabInfo();
+    
+  }, 300000);
 
 });
 

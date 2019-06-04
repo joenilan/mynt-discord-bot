@@ -4,11 +4,11 @@
   "description": "Mynt Discord bot",
   "main": "bot.js",
   "dependencies": {
+    "axios": "^0.18.1",
     "bitcoin-core": "^2.0.0",
-    "discord.js": "^11.5.0",
-    "node-binance-api": "^0.9.1",
+    "discord.js": "^11.5.1",
+    "node-binance-api": "^0.9.2",
     "node-bittrex-api": "^0.8.3",
-    "axios": "^0.18.0",
     "sqlite3": "^4.0.8"
   },
   "devDependencies": {},
