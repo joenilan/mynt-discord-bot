@@ -1,52 +1,11 @@
-// Load up the discord.js library
 const Discord = require("discord.js");
 const axios = require('axios');
 const fs = require('fs');
-
-// This is your client. Some people call it `bot`, some people call it `self`, 
-// some might call it `cootchie`. Either way, when you see `client.something`, or `client.something`,
-// this is what we're refering to. Your client.
 const client = new Discord.Client();
-
-// Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./secrets.json");
-// config.token contains the bot's token
-// config.prefix contains the message prefix.
 
-// Load other Modules
-// require("./modules/swiftex.cmd.js");
-// const Files = require('fs');
-
-// client.modules = [];
-// Files.readdir('./modules/', (err, files) => {
-//   if (err) {
-//     console.error(err);
-//     process.exit(1);
-//   }
-//   console.log("Loading modules...");
-//   console.log(" ");
-//   files.forEach((file, index) => {
-//     if (file.endsWith('.cmd.js')){
-//     console.log(file);
-//     client.modules.push(require('./modules/' + file));
-//     }
-//   });
-//   console.log("Finished.");
-//   console.log(" ");
-// });
-
-// Update bot Status
 function updatePresence() {
   client.user.setActivity(`Serving ${client.guilds.size} servers`);
-//   let guilds = client.guilds ? client.guilds.array().length : 0;
-//   client.user.setPresence({
-//     status: 'online',
-//     game: {
-//       name: `in ${guilds} guild${guilds === 1 ? '' : 's'} | ${
-//         config.prefix
-//       }help`
-//     }
-//   });
 }
 
 function grabInfo() {
@@ -61,9 +20,10 @@ function grabInfo() {
     var circulatingSupply = response3.data['market_data']['circulating_supply']
     var geckoRank = response3.data['coingecko_rank']
     var lastPrice = response1.data['ticker']['last']
-    var volume = response1.data['ticker']['volume']
-    var lastUpdated = response1.data['at']
     var btcPrice = response2.data['bitcoin']['usd']
+    var volumeConvert = (Number(response1.data['ticker']['volume']) * Number(lastPrice).toFixed(8)) * Number(btcPrice)
+    var volume = volumeConvert.toFixed(2)
+    var lastUpdated = response1.data['at']
     var convertedPrice = (Number(lastPrice) * Number(btcPrice)).toFixed(9)
     var ticker = {
       "mynt": [
@@ -74,7 +34,7 @@ function grabInfo() {
               "rank": geckoRank.toString(), 
               "price_usd": convertedPrice, 
               "price_btc": lastPrice, 
-              "24h_volume_usd": volume, 
+              "24h_volume_usd": volume.toString(), 
               "market_cap_usd": marketCapUSD.toString(), 
               "available_supply": circulatingSupply.toString(), 
               "total_supply": totalSupply.toString(), 
